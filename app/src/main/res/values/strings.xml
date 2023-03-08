@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">MyNotes</string>
+    <string name="splash_logo">splash logo</string>
 </resources>

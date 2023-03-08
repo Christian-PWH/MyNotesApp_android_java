@@ -1,9 +1,11 @@
-package com.example.mynotes;
+package com.example.mynotes.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.os.Bundle;
+
+import com.example.mynotes.R;
 
 public class HomeActivity extends AppCompatActivity {
     Toolbar toolbar;

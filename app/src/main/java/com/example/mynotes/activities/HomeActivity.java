@@ -2,19 +2,17 @@ package com.example.mynotes.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.MenuItem;
 import android.widget.Button;
-import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.PopupMenu;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.mynotes.R;
-import com.example.mynotes.adapters.GridViewAdapter;
+import com.example.mynotes.adapters.RecyclerViewAdapter;
 import com.example.mynotes.models.NoteModel;
 import com.example.mynotes.sqlite.DBManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -25,7 +23,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private DBManager dbManager;
     Toolbar toolbar;
-    GridView noteGridView;
+    RecyclerView recyclerView;
 
     FloatingActionButton addNote;
 
@@ -47,23 +45,29 @@ public class HomeActivity extends AppCompatActivity {
         toolbar.setTitle("HOME");
         setSupportActionBar(toolbar);
 
-        noteGridView = findViewById(R.id.gridNote);
-        noteGridView.setEmptyView(findViewById(R.id.infoText));
+        recyclerView = findViewById(R.id.noteRecyclerView);
 
         noteModelArrayList = new ArrayList<>();
         noteModelArrayList = (ArrayList<NoteModel>) dbManager.getAllNotes();
 
-        GridViewAdapter gridViewAdapter = new GridViewAdapter(this, noteModelArrayList);
-        gridViewAdapter.notifyDataSetChanged();
-        noteGridView.setAdapter(gridViewAdapter);
+        RecyclerViewAdapter recyclerViewAdapter = new RecyclerViewAdapter(noteModelArrayList, this);
 
-        noteGridView.setOnItemClickListener((adapterView, view, position, l) -> {
+        GridLayoutManager layoutManager=new GridLayoutManager(this,2);
+
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setAdapter(recyclerViewAdapter);
+
+        recyclerViewAdapter.setOnItemClickListener(noteModel -> {
+
+        });
+
+//        recyclerView.setOnItemClickListener((adapterView, view, position, l) -> {
 //            itemPopUp = view.findViewById(R.id.itemPopUp);
 //            NoteModel noteModel = (NoteModel) adapterView.getItemAtPosition(position);
 //
 //            itemPopUp.setOnClickListener(viewDelete -> {
 //
-//                Toast.makeText(getApplicationContext(),"Masuk",Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getApplicationContext(),"in",Toast.LENGTH_SHORT).show();
 //                dbManager.deleteNote(noteModel);
 //                // Initializing the popup menu and giving the reference as current context
 //                PopupMenu popupMenu = new PopupMenu(HomeActivity.this, button);
@@ -77,20 +81,20 @@ public class HomeActivity extends AppCompatActivity {
 //                // Showing the popup menu
 //                popupMenu.show();
 //            });
-            TextView titleTextView = view.findViewById(R.id.itemTitle);
-            TextView contentTextView = view.findViewById(R.id.itemContent);
-
-            String title = titleTextView.getText().toString();
-            String content = contentTextView.getText().toString();
-
-            Intent modify_intent = new Intent(getApplicationContext(), CreateUpdateActivity.class);
-            modify_intent.putExtra("category_id", 1);
-            modify_intent.putExtra("id", position);
-            modify_intent.putExtra("title", title);
-            modify_intent.putExtra("desc", content);
-
-            startActivity(modify_intent);
-        });
+//            TextView titleTextView = view.findViewById(R.id.itemTitle);
+//            TextView contentTextView = view.findViewById(R.id.itemContent);
+//
+//            String title = titleTextView.getText().toString();
+//            String content = contentTextView.getText().toString();
+//
+//            Intent modify_intent = new Intent(getApplicationContext(), CreateUpdateActivity.class);
+//            modify_intent.putExtra("category_id", 1);
+//            modify_intent.putExtra("id", position);
+//            modify_intent.putExtra("title", title);
+//            modify_intent.putExtra("desc", content);
+//
+//            startActivity(modify_intent);
+//        });
 
         addNote = findViewById(R.id.addNote);
         addNote.setOnClickListener(view -> {
@@ -101,13 +105,4 @@ public class HomeActivity extends AppCompatActivity {
             startActivity(create_intent);
         });
     }
-
-    private void reload() {
-        noteModelArrayList = new ArrayList<>();
-        noteModelArrayList = (ArrayList<NoteModel>) dbManager.getAllNotes();
-        GridViewAdapter gridViewAdapter = new GridViewAdapter(this, noteModelArrayList);
-        gridViewAdapter.notifyDataSetChanged();
-        noteGridView.setAdapter(gridViewAdapter);
-    }
-
 }

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="200dp"
+    android:layout_gravity="center"
+    android:layout_margin="10dp"
+    app:cardCornerRadius="15dp"
+    app:cardElevation="10dp"
+    app:contentPadding="5dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/itemTitle"
+                android:layout_width="200dp"
+                android:layout_height="match_parent"
+                android:ellipsize="end"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                tools:text="TITLE" />
+
+            <ImageView
+                android:id="@+id/itemPopUp"
+                style="@android:style/Widget.Holo.ImageButton"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center|end"
+                android:layout_weight="30"
+                android:backgroundTint="#9A9292"
+                android:contentDescription="@string/popup_menu"
+                android:elevation="5dp"
+                android:scaleType="center"
+                app:srcCompat="@android:drawable/ic_menu_more"
+                app:tint="#000000"
+                tools:ignore="ImageContrastCheck,InefficientWeight" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/itemContent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:ellipsize="end"
+            android:maxLines="5"
+            tools:ignore="VisualLintLongText"
+            tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis in libero sed elit pretium fermentum vitae fringilla nulla. Sed in massa luctus, sagittis est nec, porttitor diam. Sed bibendum nisi et libero finibus blandit. Fusce feugiat interdum orci, id euismod ipsum placerat a. Pellentesque molestie odio ut risus sagittis gravida. Nulla ut purus tempus, venenatis mi posuere, volutpat erat. Nam nibh lectus, feugiat eu neque a, tristique pharetra turpis. Vestibulum lacinia, ipsum posuere dictum interdum, urna leo laoreet lectus, et varius lorem diam a mi. Nunc vel nibh egestas nisl ultricies ornare. Nam vitae purus nec sem tincidunt fringilla. Aliquam nec augue sem. Quisque tristique felis auctor, lobortis tellus quis, feugiat ante. Nam id velit elementum nibh venenatis egestas eu quis enim. Nam nec commodo neque, quis suscipit felis." />
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

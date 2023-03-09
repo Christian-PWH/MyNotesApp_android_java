@@ -25,4 +25,55 @@
             android:theme="?attr/actionBarTheme" />
     </com.google.android.material.appbar.AppBarLayout>
 
+    <GridView
+        android:id="@+id/gridNote"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:horizontalSpacing="6dp"
+        android:numColumns="2"
+        android:paddingLeft="5dp"
+        android:paddingTop="5dp"
+        android:paddingRight="5dp"
+        android:paddingBottom="5dp"
+        android:verticalSpacing="6dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/appbar">
+
+    </GridView>
+
+    <TextView
+        android:id="@+id/infoText"
+        android:layout_width="250dp"
+        android:layout_height="60dp"
+        android:text="@string/info_text"
+        android:textAlignment="center"
+        android:textColor="#838383"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/appbar"
+        tools:ignore="TextContrastCheck" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/addNote"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:clickable="true"
+        android:contentDescription="@string/add_note"
+        android:focusable="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.887"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/appbar"
+        app:layout_constraintVertical_bias="0.935"
+        app:srcCompat="@android:drawable/ic_input_add"
+        tools:ignore="ImageContrastCheck" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,4 +1,13 @@
 <resources>
     <string name="app_name">MyNotes</string>
     <string name="splash_logo">splash logo</string>
+    <string name="info_text">There is no notes!</string>
+    <string name="add_note">Add Note</string>
+    <string name="popup_menu">PopUp Menu</string>
+    <string name="update_note">Update Note</string>
+    <string name="title_create_update">Write a title!</string>
+    <string name="content_create_update">Write a content!</string>
+    <string name="button_create_update">Create and Update</string>
+    <string name="modify_menu">modify</string>
+    <string name="delete_menu">delete</string>
 </resources>

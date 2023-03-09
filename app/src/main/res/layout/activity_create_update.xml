@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activities.CreateUpdateActivity">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar"
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/colorPrimary"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="?attr/actionBarTheme" />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <EditText
+        android:id="@+id/editTitle"
+        android:layout_width="239dp"
+        android:layout_height="54dp"
+        android:layout_marginTop="50dp"
+        android:autofillHints=""
+        android:ems="10"
+        android:gravity="center|start"
+        android:hint="@string/title_create_update"
+        android:inputType="text"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.197"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/appbar"
+        app:layout_constraintVertical_bias="0.036"
+        tools:ignore="LabelFor" />
+
+    <EditText
+        android:id="@+id/editContent"
+        android:layout_width="325dp"
+        android:layout_height="151dp"
+        android:layout_marginTop="30dp"
+        android:autofillHints=""
+        android:ems="10"
+        android:gravity="start|top"
+        android:hint="@string/content_create_update"
+        android:inputType="textMultiLine"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.39"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editTitle"
+        app:layout_constraintVertical_bias="0.0"
+        tools:ignore="LabelFor" />
+
+    <Button
+        android:id="@+id/createUpdateBtn"
+        android:layout_width="149dp"
+        android:layout_height="55dp"
+        android:contentDescription="@string/button_create_update"
+        android:elevation="5dp"
+        android:textAlignment="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editContent"
+        app:layout_constraintVertical_bias="0.143" />
+</androidx.constraintlayout.widget.ConstraintLayout>

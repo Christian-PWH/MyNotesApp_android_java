@@ -48,10 +48,11 @@ public class CreateUpdateActivity extends AppCompatActivity {
             int id = intent.getIntExtra("id", 0);
             createUpdateBtn.setText("Create Note");
             createUpdateBtn.setOnClickListener(view -> {
-                if(editTitle.getText().toString() == null || editContent.getText().toString() == null) {
-                    Toast.makeText(getApplicationContext(),"Field is Empty!",Toast.LENGTH_SHORT).show();
+                if (editTitle.getText().toString() == null || editContent.getText().toString() == null) {
+                    Toast.makeText(getApplicationContext(), "Field is Empty!", Toast.LENGTH_SHORT).show();
                 }
                 dbManager.addNote(new NoteModel(id, editTitle.getText().toString(), editContent.getText().toString()));
+                Toast.makeText(this, "Item " + (id + 1) + " modified", Toast.LENGTH_SHORT).show();
                 Intent newIntent = new Intent(getApplicationContext(), HomeActivity.class);
                 startActivity(newIntent);
                 finish();
@@ -70,6 +71,7 @@ public class CreateUpdateActivity extends AppCompatActivity {
             createUpdateBtn.setText("Modify Note");
             createUpdateBtn.setOnClickListener(view -> {
                 dbManager.updateNote(new NoteModel(id, editTitle.getText().toString(), editContent.getText().toString()));
+                Toast.makeText(this, "Note Created", Toast.LENGTH_SHORT).show();
                 Intent newIntent = new Intent(getApplicationContext(), HomeActivity.class);
                 startActivity(newIntent);
                 finish();

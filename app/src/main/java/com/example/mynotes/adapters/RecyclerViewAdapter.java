@@ -4,24 +4,27 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.mynotes.R;
-import com.example.mynotes.interfaces.RecyclerViewItemClick;
+import com.example.mynotes.interfaces.ClickListener;
 import com.example.mynotes.models.NoteModel;
+import com.example.mynotes.sqlite.DBManager;
 
 import java.util.ArrayList;
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.RecyclerViewHolder> {
 
     private ArrayList<NoteModel> noteModelArrayList;
-    private RecyclerViewItemClick onItemClickListener;
+    private ClickListener clickListener;
 
-    public RecyclerViewAdapter(ArrayList<NoteModel> recyclerDataArrayList, Context mContext) {
+    public RecyclerViewAdapter(Context mContext, ArrayList<NoteModel> recyclerDataArrayList, ClickListener listener) {
         this.noteModelArrayList = recyclerDataArrayList;
+        this.clickListener = listener;
     }
 
 
@@ -37,6 +40,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         NoteModel noteModel = noteModelArrayList.get(position);
         holder.title.setText(noteModel.getTitle());
         holder.content.setText(noteModel.getContent());
+        holder.popUpbtn.setOnClickListener(view -> {
+            clickListener.onItemClick(view, noteModel);
+        });
     }
 
     @Override
@@ -49,18 +55,14 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         private final TextView title;
         private final TextView content;
 
+        private final ImageView popUpbtn;
+
         public RecyclerViewHolder(@NonNull View itemView) {
             super(itemView);
             title = itemView.findViewById(R.id.itemTitle);
             content = itemView.findViewById(R.id.itemContent);
+            popUpbtn = itemView.findViewById(R.id.itemPopUp);
         }
     }
 
-    public RecyclerViewItemClick getOnItemClickListener() {
-        return onItemClickListener;
-    }
-
-    public void setOnItemClickListener(RecyclerViewItemClick onItemClickListener) {
-        this.onItemClickListener = onItemClickListener;
-    }
 }

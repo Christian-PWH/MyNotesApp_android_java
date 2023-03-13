@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">MyNotes</string>
+    <string name="nav_open">Open</string>
+    <string name="nav_close">Close</string>
     <string name="splash_logo">splash logo</string>
     <string name="info_text">There is no notes!</string>
     <string name="add_note">Add Note</string>
@@ -10,4 +12,10 @@
     <string name="button_create_update">Create and Update</string>
     <string name="modify_menu">modify</string>
     <string name="delete_menu">delete</string>
+    <string name="register">Register</string>
+    <string name="email_hint_textField">Enter your Email</string>
+    <string name="pass_hint_textField">Enter your Password</string>
+    <string name="register_btn">REGISTER</string>
+    <string name="login">Login</string>
+    <string name="login_btn">LOGIN</string>
 </resources>

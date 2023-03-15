@@ -62,7 +62,7 @@ public class DBManager {
         if (cursor.moveToFirst()) {
             do {
                 NoteModel noteModel = new NoteModel();
-                noteModel.setId(Integer.parseInt(cursor.getString(0)));
+                noteModel.setId(cursor.getString(0));
                 noteModel.setTitle(cursor.getString(1));
                 noteModel.setContent(cursor.getString(2));
 

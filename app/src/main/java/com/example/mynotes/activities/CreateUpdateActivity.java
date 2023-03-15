@@ -13,10 +13,18 @@ import android.widget.Toast;
 import com.example.mynotes.R;
 import com.example.mynotes.models.NoteModel;
 import com.example.mynotes.sqlite.DBManager;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class CreateUpdateActivity extends AppCompatActivity {
 
-    private DBManager dbManager;
+    private FirebaseFirestore db;
+
+//    private DBManager dbManager;
     Toolbar toolbar;
 
     EditText editTitle;
@@ -32,8 +40,11 @@ public class CreateUpdateActivity extends AppCompatActivity {
         Intent intent = getIntent();
         int category_id = intent.getIntExtra("category_id", 0);
 
-        dbManager = new DBManager(this);
-        dbManager.open();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        db = FirebaseFirestore.getInstance();
+
+//        dbManager = new DBManager(this);
+//        dbManager.open();
 
         toolbar = findViewById(R.id.toolbar);
         editTitle = findViewById(R.id.editTitle);
@@ -45,24 +56,45 @@ public class CreateUpdateActivity extends AppCompatActivity {
             toolbar.setTitle("Create Note");
             setSupportActionBar(toolbar);
 
-            int id = intent.getIntExtra("id", 0);
+            String id = intent.getStringExtra("id");
             createUpdateBtn.setText("Create Note");
             createUpdateBtn.setOnClickListener(view -> {
                 if (editTitle.getText().toString() == null || editContent.getText().toString() == null) {
                     Toast.makeText(getApplicationContext(), "Field is Empty!", Toast.LENGTH_SHORT).show();
                 }
-                dbManager.addNote(new NoteModel(id, editTitle.getText().toString(), editContent.getText().toString()));
-                Toast.makeText(this, "Item " + (id + 1) + " modified", Toast.LENGTH_SHORT).show();
-                Intent newIntent = new Intent(getApplicationContext(), HomeActivity.class);
-                startActivity(newIntent);
-                finish();
+
+                Map<String, Object> note = new HashMap<>();
+                note.put("id", id);
+                note.put("title", editTitle.getText().toString());
+                note.put("content", editContent.getText().toString() == null);
+
+                if(user != null) {
+                    db.collection("User_Collection")
+                            .document(user.getUid())
+                            .collection("Notes")
+                            .add(note).addOnSuccessListener(documentReference -> {
+                                Toast.makeText(this, "Item " + (id + 1) + " modified", Toast.LENGTH_SHORT).show();
+                                Intent newIntent = new Intent(getApplicationContext(), HomeActivity.class);
+                                startActivity(newIntent);
+                                finish();
+                            }).addOnFailureListener(e -> {
+                                Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                            });
+                }
+
+//                dbManager.addNote(new NoteModel(id, editTitle.getText().toString(), editContent.getText().toString()));
+
+//                Toast.makeText(this, "Item " + (id + 1) + " modified", Toast.LENGTH_SHORT).show();
+//                Intent newIntent = new Intent(getApplicationContext(), HomeActivity.class);
+//                startActivity(newIntent);
+//                finish();
             });
 
         } else {
             toolbar.setTitle("Modify Note");
             setSupportActionBar(toolbar);
 
-            int id = intent.getIntExtra("id", 0);
+            String id = intent.getStringExtra("id");
             String title = intent.getStringExtra("title");
             String content = intent.getStringExtra("content");
 
@@ -70,11 +102,31 @@ public class CreateUpdateActivity extends AppCompatActivity {
             editContent.setText(content);
             createUpdateBtn.setText("Modify Note");
             createUpdateBtn.setOnClickListener(view -> {
-                dbManager.updateNote(new NoteModel(id, editTitle.getText().toString(), editContent.getText().toString()));
-                Toast.makeText(this, "Note Created", Toast.LENGTH_SHORT).show();
-                Intent newIntent = new Intent(getApplicationContext(), HomeActivity.class);
-                startActivity(newIntent);
-                finish();
+//                dbManager.updateNote(new NoteModel(id, editTitle.getText().toString(), editContent.getText().toString()));
+                Map<String, Object> note = new HashMap<>();
+                note.put("id", id);
+                note.put("title", editTitle.getText().toString());
+                note.put("content", editContent.getText().toString() == null);
+
+                if(user != null) {
+                    db.collection("User_Collection")
+                            .document(user.getUid())
+                            .collection("Notes")
+                            .document(id)
+                            .set(note).addOnSuccessListener(documentReference -> {
+                                Toast.makeText(this, "Note Modified", Toast.LENGTH_SHORT).show();
+                                Intent newIntent = new Intent(getApplicationContext(), HomeActivity.class);
+                                startActivity(newIntent);
+                                finish();
+                            }).addOnFailureListener(e -> {
+                                Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                            });
+                }
+
+//                Toast.makeText(this, "Note Modified", Toast.LENGTH_SHORT).show();
+//                Intent newIntent = new Intent(getApplicationContext(), HomeActivity.class);
+//                startActivity(newIntent);
+//                finish();
             });
         }
     }

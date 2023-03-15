@@ -26,13 +26,20 @@ import com.example.mynotes.sqlite.DBManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-    private DBManager dbManager;
+    //    private DBManager dbManager;
+    private FirebaseFirestore db;
+    private FirebaseUser user;
+
     private ClickListener clickListener;
 
     private DrawerLayout drawerLayout;
@@ -52,8 +59,11 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        dbManager = new DBManager(this);
-        dbManager.open();
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        db = FirebaseFirestore.getInstance();
+
+//        dbManager = new DBManager(this);
+//        dbManager.open();
 
         drawerLayout = findViewById(R.id.drawerLayout);
         navigationView = findViewById(R.id.navView);
@@ -69,11 +79,10 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         recyclerView = findViewById(R.id.noteRecyclerView);
 
         noteModelArrayList = new ArrayList<>();
-        noteModelArrayList = (ArrayList<NoteModel>) dbManager.getAllNotes();
+//        noteModelArrayList = (ArrayList<NoteModel>) dbManager.getAllNotes();
 
         infoText = findViewById(R.id.infoText);
 
-        if (!noteModelArrayList.isEmpty()) infoText.setVisibility(View.GONE);
         clickListener = this::popUpMenuOption;
 
         recyclerViewAdapter = new RecyclerViewAdapter(this, noteModelArrayList, clickListener);
@@ -82,12 +91,39 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(recyclerViewAdapter);
 
+        db.collection("User_Collection")
+                .document(user != null ? user.getUid() : "")
+                .collection("Notes")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    noteModelArrayList.clear();
+                    if (!queryDocumentSnapshots.isEmpty()) {
+                        List<DocumentSnapshot> list = queryDocumentSnapshots.getDocuments();
+                        for (DocumentSnapshot d : list) {
+                            NoteModel noteModel = new NoteModel(
+                                    d.getId(),
+                                    d.getString("title"),
+                                    d.getString("content")
+                            );
+
+
+                            noteModelArrayList.add(noteModel);
+                        }
+                        if (!noteModelArrayList.isEmpty()) infoText.setVisibility(View.GONE);
+                        recyclerViewAdapter.notifyDataSetChanged();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    infoText.setVisibility(View.VISIBLE);
+                    infoText.setText("No note has been found!");
+                });
+
         addNote = findViewById(R.id.addNote);
         addNote.setOnClickListener(view -> {
             Intent create_intent = new Intent(getApplicationContext(), CreateUpdateActivity.class);
             create_intent.putExtra("category_id", 0);
-            create_intent.putExtra("id", dbManager.getAllNotes().isEmpty() ? 0 : dbManager.getAllNotes().size() - 1);
-
+//            create_intent.putExtra("id", dbManager.getAllNotes().isEmpty() ? 0 : dbManager.getAllNotes().size() - 1);
+            create_intent.putExtra("id", noteModelArrayList.isEmpty() ? 0 : noteModelArrayList.size());
             startActivity(create_intent);
         });
     }
@@ -106,9 +142,20 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
                 startActivity(modify_intent);
             } else {
-                dbManager.deleteNote(noteModel);
-                Toast.makeText(this, "item " + (noteModel.getId() + 1) + " deleted", Toast.LENGTH_SHORT).show();
-                reload();
+                db.collection("User_Collection")
+                        .document(user != null ? user.getUid() : "")
+                        .collection("Notes")
+                        .document(noteModel.getId())
+                        .delete()
+                        .addOnSuccessListener(unused -> {
+                            Toast.makeText(this, "Note deleted", Toast.LENGTH_SHORT).show();
+                        })
+                        .addOnFailureListener(e -> {
+                            Toast.makeText(this, "Error deleting note", Toast.LENGTH_SHORT).show();
+                        });
+//                dbManager.deleteNote(noteModel);
+//                Toast.makeText(this, "item " + (noteModel.getId() + 1) + " deleted", Toast.LENGTH_SHORT).show();
+//                reload();
             }
             return true;
         });
@@ -116,21 +163,21 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         popupMenu.show();
     }
 
-    private void reload() {
-        noteModelArrayList = new ArrayList<>();
-        noteModelArrayList = (ArrayList<NoteModel>) dbManager.getAllNotes();
-
-        infoText = findViewById(R.id.infoText);
-
-        if (!noteModelArrayList.isEmpty()) infoText.setVisibility(View.GONE);
-        clickListener = this::popUpMenuOption;
-
-        recyclerViewAdapter = new RecyclerViewAdapter(this, noteModelArrayList, clickListener);
-        GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
-
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setAdapter(recyclerViewAdapter);
-    }
+//    private void reload() {
+//        noteModelArrayList = new ArrayList<>();
+//        noteModelArrayList = (ArrayList<NoteModel>) dbManager.getAllNotes();
+//
+//        infoText = findViewById(R.id.infoText);
+//
+//        if (!noteModelArrayList.isEmpty()) infoText.setVisibility(View.GONE);
+//        clickListener = this::popUpMenuOption;
+//
+//        recyclerViewAdapter = new RecyclerViewAdapter(this, noteModelArrayList, clickListener);
+//        GridLayoutManager layoutManager = new GridLayoutManager(this, 2);
+//
+//        recyclerView.setLayoutManager(layoutManager);
+//        recyclerView.setAdapter(recyclerViewAdapter);
+//    }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {

@@ -1,23 +1,23 @@
 package com.example.mynotes.models;
 
 public class NoteModel {
-    int id;
+    String id;
     String title;
     String content;
 
     public NoteModel() {}
 
-    public NoteModel(int id, String title, String content) {
+    public NoteModel(String id, String title, String content) {
         this.id = id;
         this.title = title;
         this.content = content;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 

@@ -66,7 +66,7 @@ public class CreateUpdateActivity extends AppCompatActivity {
                 Map<String, Object> note = new HashMap<>();
                 note.put("id", id);
                 note.put("title", editTitle.getText().toString());
-                note.put("content", editContent.getText().toString() == null);
+                note.put("content", editContent.getText().toString());
 
                 if(user != null) {
                     db.collection("User_Collection")
@@ -106,7 +106,7 @@ public class CreateUpdateActivity extends AppCompatActivity {
                 Map<String, Object> note = new HashMap<>();
                 note.put("id", id);
                 note.put("title", editTitle.getText().toString());
-                note.put("content", editContent.getText().toString() == null);
+                note.put("content", editContent.getText().toString());
 
                 if(user != null) {
                     db.collection("User_Collection")

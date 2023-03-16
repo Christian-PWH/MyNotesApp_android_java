@@ -41,7 +41,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         holder.title.setText(noteModel.getTitle());
         holder.content.setText(noteModel.getContent());
         holder.popUpbtn.setOnClickListener(view -> {
-            clickListener.onItemClick(view, noteModel);
+            clickListener.onItemClick(this, position, view, noteModel);
         });
     }
 

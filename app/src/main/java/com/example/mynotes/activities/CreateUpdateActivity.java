@@ -73,7 +73,7 @@ public class CreateUpdateActivity extends AppCompatActivity {
                             .document(user.getUid())
                             .collection("Notes")
                             .add(note).addOnSuccessListener(documentReference -> {
-                                Toast.makeText(this, "Item " + (id + 1) + " modified", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(this, "Item " + (id + 1) + " created", Toast.LENGTH_SHORT).show();
                                 Intent newIntent = new Intent(getApplicationContext(), HomeActivity.class);
                                 startActivity(newIntent);
                                 finish();

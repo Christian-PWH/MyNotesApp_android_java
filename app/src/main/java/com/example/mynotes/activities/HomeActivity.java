@@ -128,7 +128,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         });
     }
 
-    private void popUpMenuOption(View view, NoteModel noteModel) {
+    private void popUpMenuOption(RecyclerViewAdapter recyclerViewAdapter, int position, View view, NoteModel noteModel) {
         PopupMenu popupMenu = new PopupMenu(HomeActivity.this, view);
 
         popupMenu.getMenuInflater().inflate(R.menu.popup_menu, popupMenu.getMenu());
@@ -149,6 +149,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                         .delete()
                         .addOnSuccessListener(unused -> {
                             Toast.makeText(this, "Note deleted", Toast.LENGTH_SHORT).show();
+                            recyclerViewAdapter.notifyItemRemoved(position);
                         })
                         .addOnFailureListener(e -> {
                             Toast.makeText(this, "Error deleting note", Toast.LENGTH_SHORT).show();

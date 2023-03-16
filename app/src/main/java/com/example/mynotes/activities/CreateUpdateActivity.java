@@ -56,7 +56,7 @@ public class CreateUpdateActivity extends AppCompatActivity {
             toolbar.setTitle("Create Note");
             setSupportActionBar(toolbar);
 
-            String id = intent.getStringExtra("id");
+            int id = intent.getIntExtra("id", 0);
             createUpdateBtn.setText("Create Note");
             createUpdateBtn.setOnClickListener(view -> {
                 if (editTitle.getText().toString() == null || editContent.getText().toString() == null) {

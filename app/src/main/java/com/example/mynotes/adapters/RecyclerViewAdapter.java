@@ -41,7 +41,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         holder.title.setText(noteModel.getTitle());
         holder.content.setText(noteModel.getContent());
         holder.popUpbtn.setOnClickListener(view -> {
-            clickListener.onItemClick(this, position, view, noteModel);
+            clickListener.onItemClick(position, view, noteModel);
         });
     }
 
@@ -62,6 +62,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             title = itemView.findViewById(R.id.itemTitle);
             content = itemView.findViewById(R.id.itemContent);
             popUpbtn = itemView.findViewById(R.id.itemPopUp);
+
         }
     }
 

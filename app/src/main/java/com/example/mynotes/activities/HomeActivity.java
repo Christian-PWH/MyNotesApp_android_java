@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -27,13 +28,28 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.example.mynotes.services.EncryptionService;
 
 
+import java.io.ByteArrayOutputStream;
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidParameterSpecException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 public class HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -92,8 +108,33 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(recyclerViewAdapter);
 
-        db.collection("User_Collection")
-                .document(user != null ? user.getUid() : "")
+        /* Cryptography */
+        SharedPreferences sharedPreferences = getSharedPreferences("Secret_Key", MODE_PRIVATE);
+        String secretKeyStr = sharedPreferences.getString("key", "");
+
+        // Just in case something nightmare happen
+        if (secretKeyStr.equals("")){
+            Intent backToRoot = new Intent(HomeActivity.this, LoginActivity.class);
+            startActivity(backToRoot);
+            finish();
+        }
+
+        String[] tmp = secretKeyStr.split(",");
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        for (String a : tmp) {
+            output.write(Integer.parseInt(a));
+        }
+        byte[] secretKeyByteArr = output.toByteArray();
+
+        SecretKey secretKey = new SecretKeySpec(secretKeyByteArr, "AES");
+        Log.d("secret key create update", Arrays.toString(secretKey.getEncoded()));
+
+        DocumentReference documentReference = db.collection("User_Collection")
+                .document(user != null ? user.getUid() : "");
+
+        /* End Of Cryptography */
+
+        documentReference
                 .collection("Notes")
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
@@ -101,10 +142,23 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                     if (!queryDocumentSnapshots.isEmpty()) {
                         List<DocumentSnapshot> list = queryDocumentSnapshots.getDocuments();
                         for (DocumentSnapshot d : list) {
+                            String titleDec = "";
+                            String contentDec = "";
+                            try {
+                                titleDec = EncryptionService.decryptMsg(d.getString("title"), secretKey);
+                                contentDec = EncryptionService.decryptMsg(d.getString("content"), secretKey);
+                            } catch (NoSuchAlgorithmException | NoSuchPaddingException |
+                                     InvalidKeyException | InvalidParameterSpecException |
+                                     IllegalBlockSizeException | BadPaddingException |
+                                     UnsupportedEncodingException |
+                                     InvalidAlgorithmParameterException e) {
+                                e.printStackTrace();
+                                throw new RuntimeException(e);
+                            }
                             NoteModel noteModel = new NoteModel(
                                     d.getId(),
-                                    d.getString("title"),
-                                    d.getString("content")
+                                    titleDec,
+                                    contentDec
                             );
 
 

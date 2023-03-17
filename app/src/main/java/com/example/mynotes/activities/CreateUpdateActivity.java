@@ -5,7 +5,9 @@ import androidx.appcompat.widget.Toolbar;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -16,9 +18,22 @@ import com.example.mynotes.sqlite.DBManager;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.example.mynotes.services.EncryptionService;
 
+import java.io.ByteArrayOutputStream;
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidParameterSpecException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 public class CreateUpdateActivity extends AppCompatActivity {
 
@@ -40,6 +55,28 @@ public class CreateUpdateActivity extends AppCompatActivity {
         Intent intent = getIntent();
         int category_id = intent.getIntExtra("category_id", 0);
 
+        /* Cryptography */
+        SharedPreferences sharedPreferences = getSharedPreferences("Secret_Key", MODE_PRIVATE);
+        String secretKeyStr = sharedPreferences.getString("key", "");
+
+        // Just in case something nightmare happen
+        if (secretKeyStr.equals("")){
+            Intent backToRoot = new Intent(CreateUpdateActivity.this, LoginActivity.class);
+            startActivity(backToRoot);
+            finish();
+        }
+
+        String[] tmp = secretKeyStr.split(",");
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        for (String a : tmp) {
+            output.write(Integer.parseInt(a));
+        }
+        byte[] secretKeyByteArr = output.toByteArray();
+
+        SecretKey secretKey = new SecretKeySpec(secretKeyByteArr, "AES");
+        Log.d("secret key create update", Arrays.toString(secretKey.getEncoded()));
+        /* End Of Cryptography */
+
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         db = FirebaseFirestore.getInstance();
 
@@ -51,7 +88,7 @@ public class CreateUpdateActivity extends AppCompatActivity {
         editContent = findViewById(R.id.editContent);
         createUpdateBtn = findViewById(R.id.createUpdateBtn);
 
-
+        // Create Note
         if (category_id == 0) {
             toolbar.setTitle("Create Note");
             setSupportActionBar(toolbar);
@@ -62,11 +99,23 @@ public class CreateUpdateActivity extends AppCompatActivity {
                 if (editTitle.getText().toString() == null || editContent.getText().toString() == null) {
                     Toast.makeText(getApplicationContext(), "Field is Empty!", Toast.LENGTH_SHORT).show();
                 }
-
+                String titleEnc = "";
+                String contentEnc = "";
+                try {
+                    titleEnc = EncryptionService.encryptMsg(editTitle.getText().toString(), secretKey);
+                    contentEnc = EncryptionService.encryptMsg(editContent.getText().toString(), secretKey);
+                } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException |
+                         InvalidParameterSpecException | IllegalBlockSizeException |
+                         BadPaddingException | UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                    throw new RuntimeException(e);
+                }
+                Log.d("secret key", titleEnc);
+                Log.d("secret key", contentEnc);
                 Map<String, Object> note = new HashMap<>();
                 note.put("id", id);
-                note.put("title", editTitle.getText().toString());
-                note.put("content", editContent.getText().toString());
+                note.put("title", titleEnc);
+                note.put("content", contentEnc);
 
                 if(user != null) {
                     db.collection("User_Collection")
@@ -90,7 +139,9 @@ public class CreateUpdateActivity extends AppCompatActivity {
 //                finish();
             });
 
-        } else {
+        }
+        // Mofidy Note
+        else {
             toolbar.setTitle("Modify Note");
             setSupportActionBar(toolbar);
 

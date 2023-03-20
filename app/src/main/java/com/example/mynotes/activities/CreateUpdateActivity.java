@@ -144,7 +144,7 @@ public class CreateUpdateActivity extends AppCompatActivity {
             });
 
         }
-        // modify Note
+        // Modify Note
         else {
             toolbar.setTitle("Modify Note");
             setSupportActionBar(toolbar);
@@ -158,10 +158,24 @@ public class CreateUpdateActivity extends AppCompatActivity {
             createUpdateBtn.setText("Modify Note");
             createUpdateBtn.setOnClickListener(view -> {
 //                dbManager.updateNote(new NoteModel(id, editTitle.getText().toString(), editContent.getText().toString()));
+                String titleEnc = "";
+                String contentEnc = "";
+                try {
+                    titleEnc = EncryptionService.encryptMsg(editTitle.getText().toString(), secretKey);
+                    contentEnc = EncryptionService.encryptMsg(editContent.getText().toString(), secretKey);
+                } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException |
+                         InvalidParameterSpecException | IllegalBlockSizeException |
+                         BadPaddingException | UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                    throw new RuntimeException(e);
+                }
+                Log.d("secret key", titleEnc);
+                Log.d("secret key", contentEnc);
+
                 Map<String, Object> note = new HashMap<>();
                 note.put("id", id);
-                note.put("title", editTitle.getText().toString());
-                note.put("content", editContent.getText().toString());
+                note.put("title", titleEnc);
+                note.put("content", contentEnc);
 
                 if (user != null) {
                     db.collection("User_Collection")

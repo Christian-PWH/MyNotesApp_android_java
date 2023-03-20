@@ -1,6 +1,7 @@
 package com.example.mynotes.activities;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -8,7 +9,6 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -16,6 +16,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.PopupMenu;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,7 +24,6 @@ import com.example.mynotes.R;
 import com.example.mynotes.adapters.RecyclerViewAdapter;
 import com.example.mynotes.interfaces.ClickListener;
 import com.example.mynotes.models.NoteModel;
-import com.example.mynotes.sqlite.DBManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -68,6 +68,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     RecyclerViewAdapter recyclerViewAdapter;
 
     TextView infoText;
+    private ProgressBar progressbar;
     FloatingActionButton addNote;
     ArrayList<NoteModel> noteModelArrayList;
 
@@ -82,16 +83,37 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 //        dbManager = new DBManager(this);
 //        dbManager.open();
 
-        drawerLayout = findViewById(R.id.drawerLayout);
-        navigationView = findViewById(R.id.navView);
-        actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.nav_open, R.string.nav_close);
-        drawerLayout.addDrawerListener(actionBarDrawerToggle);
-        actionBarDrawerToggle.syncState();
-        navigationView.setNavigationItemSelectedListener(this);
-
         toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle("HOME");
+
+        drawerLayout = findViewById(R.id.drawerLayout);
+        navigationView = findViewById(R.id.navView);
+
         setSupportActionBar(toolbar);
+
+        final ActionBar actionBar = getSupportActionBar();
+
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.nav_open, R.string.nav_close) {
+
+                public void onDrawerClosed(View view) {
+                    supportInvalidateOptionsMenu();
+                    //drawerOpened = false;
+                }
+
+                public void onDrawerOpened(View drawerView) {
+                    supportInvalidateOptionsMenu();
+                    //drawerOpened = true;
+                }
+            };
+            actionBarDrawerToggle.setDrawerIndicatorEnabled(true);
+            drawerLayout.addDrawerListener(actionBarDrawerToggle);
+            actionBarDrawerToggle.syncState();
+        }
+
+
+        navigationView.setNavigationItemSelectedListener(this);
 
         recyclerView = findViewById(R.id.noteRecyclerView);
 
@@ -99,6 +121,9 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 //        noteModelArrayList = (ArrayList<NoteModel>) dbManager.getAllNotes();
 
         infoText = findViewById(R.id.infoText);
+        infoText.setVisibility(View.GONE);
+        progressbar = findViewById(R.id.progressBarHome);
+        progressbar.setVisibility(View.VISIBLE);
 
         clickListener = this::popUpMenuOption;
 
@@ -113,7 +138,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         String secretKeyStr = sharedPreferences.getString("key", "");
 
         // Just in case something nightmare happen
-        if (secretKeyStr.equals("")){
+        if (secretKeyStr.equals("")) {
             Intent backToRoot = new Intent(HomeActivity.this, LoginActivity.class);
             startActivity(backToRoot);
             finish();
@@ -164,12 +189,19 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
 
                             noteModelArrayList.add(noteModel);
                         }
-                        if (!noteModelArrayList.isEmpty()) infoText.setVisibility(View.GONE);
+                        if (!noteModelArrayList.isEmpty()) {
+                            progressbar.setVisibility(View.GONE);
+                            infoText.setVisibility(View.GONE);
+                        }
                         //recyclerViewAdapter.notifyDataSetChanged();
                         Objects.requireNonNull(recyclerView.getAdapter()).notifyItemRangeChanged(0, noteModelArrayList.size());
+                    } else {
+                        progressbar.setVisibility(View.GONE);
+                        infoText.setVisibility(View.VISIBLE);
                     }
                 })
                 .addOnFailureListener(e -> {
+                    progressbar.setVisibility(View.GONE);
                     infoText.setVisibility(View.VISIBLE);
                     infoText.setText("No note has been found!");
                 });
@@ -178,8 +210,6 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         addNote.setOnClickListener(view -> {
             Intent create_intent = new Intent(getApplicationContext(), CreateUpdateActivity.class);
             create_intent.putExtra("category_id", 0);
-//            create_intent.putExtra("id", dbManager.getAllNotes().isEmpty() ? 0 : dbManager.getAllNotes().size() - 1);
-            create_intent.putExtra("id", noteModelArrayList.isEmpty() ? 0 : noteModelArrayList.size());
             startActivity(create_intent);
         });
     }
@@ -206,12 +236,13 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
                         .addOnSuccessListener(unused -> {
                             Toast.makeText(this, "Note deleted", Toast.LENGTH_SHORT).show();
                             noteModelArrayList.remove(position);
+                            if (noteModelArrayList.isEmpty()) {
+                                infoText.setVisibility(View.VISIBLE);
+                            }
                             Objects.requireNonNull(recyclerView.getAdapter()).notifyItemRemoved(position);
-                            recyclerView.smoothScrollToPosition(position+1);
+                            recyclerView.smoothScrollToPosition(position + 1);
                         })
-                        .addOnFailureListener(e -> {
-                            Toast.makeText(this, "Error deleting note", Toast.LENGTH_SHORT).show();
-                        });
+                        .addOnFailureListener(e -> Toast.makeText(this, "Error deleting note", Toast.LENGTH_SHORT).show());
 //                dbManager.deleteNote(noteModel);
 //                Toast.makeText(this, "item " + (noteModel.getId() + 1) + " deleted", Toast.LENGTH_SHORT).show();
 //                reload();

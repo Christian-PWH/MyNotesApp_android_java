@@ -2,8 +2,6 @@ package com.example.mynotes.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.SharedElementCallback;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -24,7 +22,6 @@ import com.example.mynotes.services.EncryptionService;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -49,7 +46,7 @@ public class RegisterActivity extends AppCompatActivity {
         emailTextView = findViewById(R.id.registerEmail);
         passwordTextView = findViewById(R.id.registerPass);
         Button registerBtn = findViewById(R.id.registerBtn);
-        progressbar = findViewById(R.id.progressbar);
+        progressbar = findViewById(R.id.progressbarRegister);
 
         registerBtn.setOnClickListener(view -> registerNewUser());
 

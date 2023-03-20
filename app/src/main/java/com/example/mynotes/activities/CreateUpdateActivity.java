@@ -39,7 +39,7 @@ public class CreateUpdateActivity extends AppCompatActivity {
 
     private FirebaseFirestore db;
 
-//    private DBManager dbManager;
+    //    private DBManager dbManager;
     Toolbar toolbar;
 
     EditText editTitle;
@@ -60,7 +60,7 @@ public class CreateUpdateActivity extends AppCompatActivity {
         String secretKeyStr = sharedPreferences.getString("key", "");
 
         // Just in case something nightmare happen
-        if (secretKeyStr.equals("")){
+        if (secretKeyStr.equals("")) {
             Intent backToRoot = new Intent(CreateUpdateActivity.this, LoginActivity.class);
             startActivity(backToRoot);
             finish();
@@ -93,7 +93,6 @@ public class CreateUpdateActivity extends AppCompatActivity {
             toolbar.setTitle("Create Note");
             setSupportActionBar(toolbar);
 
-            int id = intent.getIntExtra("id", 0);
             createUpdateBtn.setText("Create Note");
             createUpdateBtn.setOnClickListener(view -> {
                 if (editTitle.getText().toString() == null || editContent.getText().toString() == null) {
@@ -112,17 +111,22 @@ public class CreateUpdateActivity extends AppCompatActivity {
                 }
                 Log.d("secret key", titleEnc);
                 Log.d("secret key", contentEnc);
-                Map<String, Object> note = new HashMap<>();
-                note.put("id", id);
-                note.put("title", titleEnc);
-                note.put("content", contentEnc);
 
-                if(user != null) {
+                Map<String, Object> note = new HashMap<>();
+
+                if (user != null) {
+                    String id = db.collection("User_Collection")
+                            .document(user.getUid())
+                            .collection("Notes").document().getId();
+                    note.put("id", id);
+                    note.put("title", titleEnc);
+                    note.put("content", contentEnc);
                     db.collection("User_Collection")
                             .document(user.getUid())
                             .collection("Notes")
-                            .add(note).addOnSuccessListener(documentReference -> {
-                                Toast.makeText(this, "Item " + (id + 1) + " created", Toast.LENGTH_SHORT).show();
+                            .document(id)
+                            .set(note).addOnSuccessListener(documentReference -> {
+                                Toast.makeText(this, "Note created", Toast.LENGTH_SHORT).show();
                                 Intent newIntent = new Intent(getApplicationContext(), HomeActivity.class);
                                 startActivity(newIntent);
                                 finish();
@@ -140,7 +144,7 @@ public class CreateUpdateActivity extends AppCompatActivity {
             });
 
         }
-        // Mofidy Note
+        // modify Note
         else {
             toolbar.setTitle("Modify Note");
             setSupportActionBar(toolbar);
@@ -159,7 +163,7 @@ public class CreateUpdateActivity extends AppCompatActivity {
                 note.put("title", editTitle.getText().toString());
                 note.put("content", editContent.getText().toString());
 
-                if(user != null) {
+                if (user != null) {
                     db.collection("User_Collection")
                             .document(user.getUid())
                             .collection("Notes")
